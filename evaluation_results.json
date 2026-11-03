@@ -1,0 +1,50 @@
+{
+    "metadata": {
+        "model": "openai/clip-vit-base-patch32",
+        "device": "cpu",
+        "total_catalog_size": 35726,
+        "timestamp": "2026-10-23 21:17:28",
+        "evaluated_per_category": 100
+    },
+    "by_category": {
+        "dress": {
+            "n_evaluated": 100,
+            "naive_r10": 3.0,
+            "naive_r50": 14.0,
+            "cads_r10": 3.0,
+            "cads_r50": 11.0,
+            "gain_r10": 0.0,
+            "gain_r50": -3.0,
+            "mean_latency_ms": 41.2
+        },
+        "shirt": {
+            "n_evaluated": 100,
+            "naive_r10": 9.0,
+            "naive_r50": 19.0,
+            "cads_r10": 9.0,
+            "cads_r50": 20.0,
+            "gain_r10": 0.0,
+            "gain_r50": 1.0,
+            "mean_latency_ms": 35.08
+        },
+        "toptee": {
+            "n_evaluated": 100,
+            "naive_r10": 9.0,
+            "naive_r50": 25.0,
+            "cads_r10": 12.0,
+            "cads_r50": 23.0,
+            "gain_r10": 3.0,
+            "gain_r50": -2.0,
+            "mean_latency_ms": 33.49
+        }
+    },
+    "overall": {
+        "avg_naive_r10": 7.0,
+        "avg_naive_r50": 19.33,
+        "avg_cads_r10": 8.0,
+        "avg_cads_r50": 18.0,
+        "avg_gain_r10": 1.0,
+        "avg_gain_r50": -1.33,
+        "overall_mean_latency_ms": 36.59
+    }
+}

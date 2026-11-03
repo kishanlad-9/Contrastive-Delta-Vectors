@@ -1,0 +1,278 @@
+{
+    "metadata": {
+        "model": "openai/clip-vit-base-patch32",
+        "device": "cpu",
+        "catalog_size": 35726,
+        "timestamp": "2026-10-23 21:28:40",
+        "total_pairs_evaluated": 2469,
+        "confidence_level": "95% Bootstrap (1,000 resamples)"
+    },
+    "by_category": {
+        "dress": {
+            "n_pairs": 1847,
+            "image_only": {
+                "r10": 1.35,
+                "r10_ci95": [
+                    0.87,
+                    1.89
+                ],
+                "r50": 4.06,
+                "r50_ci95": [
+                    3.19,
+                    4.98
+                ]
+            },
+            "text_only": {
+                "r10": 3.9,
+                "r10_ci95": [
+                    2.98,
+                    4.82
+                ],
+                "r50": 10.61,
+                "r50_ci95": [
+                    9.26,
+                    12.02
+                ]
+            },
+            "naive_blend": {
+                "r10": 5.79,
+                "r10_ci95": [
+                    4.82,
+                    6.93
+                ],
+                "r50": 13.91,
+                "r50_ci95": [
+                    12.29,
+                    15.48
+                ]
+            },
+            "ablation_normalizer": {
+                "r10": 4.28,
+                "r10_ci95": [
+                    3.36,
+                    5.25
+                ],
+                "r50": 11.91,
+                "r50_ci95": [
+                    10.5,
+                    13.48
+                ]
+            },
+            "ablation_pos_only": {
+                "r10": 4.33,
+                "r10_ci95": [
+                    3.47,
+                    5.31
+                ],
+                "r50": 11.64,
+                "r50_ci95": [
+                    10.23,
+                    13.16
+                ]
+            },
+            "cads_full": {
+                "r10": 4.55,
+                "r10_ci95": [
+                    3.52,
+                    5.52
+                ],
+                "r50": 11.91,
+                "r50_ci95": [
+                    10.34,
+                    13.48
+                ]
+            }
+        },
+        "shirt": {
+            "n_pairs": 463,
+            "image_only": {
+                "r10": 4.54,
+                "r10_ci95": [
+                    2.81,
+                    6.48
+                ],
+                "r50": 10.15,
+                "r50_ci95": [
+                    7.34,
+                    13.17
+                ]
+            },
+            "text_only": {
+                "r10": 17.49,
+                "r10_ci95": [
+                    14.04,
+                    20.74
+                ],
+                "r50": 27.86,
+                "r50_ci95": [
+                    23.76,
+                    32.18
+                ]
+            },
+            "naive_blend": {
+                "r10": 9.29,
+                "r10_ci95": [
+                    6.48,
+                    11.88
+                ],
+                "r50": 21.6,
+                "r50_ci95": [
+                    17.93,
+                    25.49
+                ]
+            },
+            "ablation_normalizer": {
+                "r10": 7.78,
+                "r10_ci95": [
+                    5.4,
+                    10.37
+                ],
+                "r50": 17.71,
+                "r50_ci95": [
+                    14.25,
+                    21.17
+                ]
+            },
+            "ablation_pos_only": {
+                "r10": 7.99,
+                "r10_ci95": [
+                    5.62,
+                    10.58
+                ],
+                "r50": 16.85,
+                "r50_ci95": [
+                    13.39,
+                    20.31
+                ]
+            },
+            "cads_full": {
+                "r10": 8.21,
+                "r10_ci95": [
+                    5.83,
+                    10.58
+                ],
+                "r50": 17.93,
+                "r50_ci95": [
+                    14.47,
+                    21.81
+                ]
+            }
+        },
+        "toptee": {
+            "n_pairs": 159,
+            "image_only": {
+                "r10": 6.92,
+                "r10_ci95": [
+                    3.14,
+                    10.69
+                ],
+                "r50": 16.35,
+                "r50_ci95": [
+                    10.69,
+                    22.01
+                ]
+            },
+            "text_only": {
+                "r10": 15.09,
+                "r10_ci95": [
+                    10.06,
+                    20.75
+                ],
+                "r50": 24.53,
+                "r50_ci95": [
+                    18.24,
+                    31.45
+                ]
+            },
+            "naive_blend": {
+                "r10": 14.47,
+                "r10_ci95": [
+                    9.43,
+                    20.13
+                ],
+                "r50": 28.93,
+                "r50_ci95": [
+                    22.0,
+                    35.85
+                ]
+            },
+            "ablation_normalizer": {
+                "r10": 15.09,
+                "r10_ci95": [
+                    10.06,
+                    20.75
+                ],
+                "r50": 26.42,
+                "r50_ci95": [
+                    19.5,
+                    33.33
+                ]
+            },
+            "ablation_pos_only": {
+                "r10": 15.72,
+                "r10_ci95": [
+                    10.69,
+                    21.38
+                ],
+                "r50": 27.67,
+                "r50_ci95": [
+                    20.75,
+                    34.59
+                ]
+            },
+            "cads_full": {
+                "r10": 16.35,
+                "r10_ci95": [
+                    10.69,
+                    22.01
+                ],
+                "r50": 27.04,
+                "r50_ci95": [
+                    19.5,
+                    34.59
+                ]
+            }
+        }
+    },
+    "overall": {
+        "image_only": {
+            "avg_r10": 4.27,
+            "avg_r50": 10.19
+        },
+        "text_only": {
+            "avg_r10": 12.16,
+            "avg_r50": 21.0
+        },
+        "naive_blend": {
+            "avg_r10": 9.85,
+            "avg_r50": 21.48
+        },
+        "ablation_normalizer": {
+            "avg_r10": 9.05,
+            "avg_r50": 18.68
+        },
+        "ablation_pos_only": {
+            "avg_r10": 9.35,
+            "avg_r50": 18.72
+        },
+        "cads_full": {
+            "avg_r10": 9.7,
+            "avg_r50": 18.96
+        }
+    },
+    "ablation_summary": {
+        "1_baseline_naive": 9.85,
+        "2_plus_normalizer": 9.05,
+        "3_plus_pos_injection": 9.35,
+        "4_plus_neg_suppression_cads": 9.7,
+        "total_absolute_gain_r10": -0.15,
+        "total_relative_gain_r10_percent": -1.52
+    },
+    "latency_profiles": {
+        "query_parsing_normalizer_ms": 0.18,
+        "clip_text_encoding_ms": 18.53,
+        "delta_fusion_ms": 0.04,
+        "faiss_search_35k_catalog_ms": 0.36,
+        "total_query_latency_ms": 19.11
+    }
+}

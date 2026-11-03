@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Upload an image and describe what you're looking for — find similar fashion products instantly using AI." />
+    <title>Fashion Finder — AI-Powered Visual Search</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+<!-- ─── Animated background blobs ─── -->
+<div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+</div>
+
+<!-- ─── Header ─── -->
+<header class="header">
+    <div class="logo">
+        <span class="logo-icon">✦</span>
+        <span class="logo-text">Fashion<span class="logo-accent">Finder</span></span>
+    </div>
+    <p class="tagline">Upload an image · Describe your style · Discover similar products</p>
+</header>
+
+<!-- ─── Main search card ─── -->
+<main class="container">
+    <section class="search-card glass" id="search-card">
+        <form id="search-form" enctype="multipart/form-data">
+
+            <!-- Image upload -->
+            <div class="upload-zone" id="upload-zone">
+                <input type="file" id="image-input" name="image" accept="image/*" hidden />
+                <div class="upload-placeholder" id="upload-placeholder">
+                    <div class="upload-icon">📷</div>
+                    <p>Drag & drop an image here</p>
+                    <span class="upload-hint">or click to browse</span>
+                </div>
+                <img id="preview-img" class="preview-img hidden" alt="Preview" />
+                <button type="button" class="btn-clear hidden" id="btn-clear" title="Remove image">✕</button>
+            </div>
+
+            <!-- Text prompt -->
+            <div class="prompt-row">
+                <input
+                    type="text"
+                    id="prompt-input"
+                    name="prompt"
+                    class="prompt-input"
+                    placeholder="Describe what you want… e.g. 'green shirt with checks and full sleeves'"
+                    autocomplete="off"
+                />
+            </div>
+
+            <!-- Quick attribute modifier chips -->
+            <div class="modifiers-bar">
+                <span class="modifiers-label">Quick modifiers:</span>
+                <div class="modifier-chips" id="modifier-chips">
+                    <button type="button" class="chip" data-val="checks">+ Checks / Plaid</button>
+                    <button type="button" class="chip" data-val="full sleeves">+ Full Sleeves</button>
+                    <button type="button" class="chip" data-val="short sleeves">+ Short Sleeves</button>
+                    <button type="button" class="chip" data-val="stripes">+ Stripes</button>
+                    <button type="button" class="chip" data-val="floral print">+ Floral</button>
+                    <button type="button" class="chip" data-val="sleeveless">+ Sleeveless</button>
+                    <button type="button" class="chip" data-val="v-neck">+ V-Neck</button>
+                </div>
+            </div>
+
+            <!-- Controls row -->
+            <div class="controls-row">
+                <!-- Category filter -->
+                <div class="control-group">
+                    <label for="category-select">Category</label>
+                    <select id="category-select" name="category" class="select-input">
+                        <option value="all">All</option>
+                        <option value="dress">Dress</option>
+                        <option value="shirt">Shirt</option>
+                        <option value="toptee">Top / Tee</option>
+                    </select>
+                </div>
+
+                <!-- Alpha slider (image vs text weight) -->
+                <div class="control-group slider-group">
+                    <label for="alpha-slider">
+                        Balance: <span id="alpha-label">50 / 50</span>
+                    </label>
+                    <div class="slider-labels">
+                        <span class="slider-edge">Text</span>
+                        <input
+                            type="range" id="alpha-slider" name="alpha"
+                            min="0" max="100" value="50"
+                            class="slider"
+                        />
+                        <span class="slider-edge">Image</span>
+                    </div>
+                </div>
+
+                <!-- Search button -->
+                <button type="submit" class="btn-search" id="btn-search">
+                    <span class="btn-text">Search</span>
+                    <span class="btn-loader hidden" id="btn-loader"></span>
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- ─── Results ─── -->
+    <section class="results-section hidden" id="results-section">
+        <div class="results-header">
+            <h2 class="results-title">Results</h2>
+            <!-- AI Query Understanding Feedback -->
+            <div class="query-feedback hidden" id="query-feedback">
+                <span class="feedback-title">⚡ Attribute Steering:</span>
+                <div class="feedback-badge-list" id="feedback-badge-list"></div>
+            </div>
+        </div>
+        <div class="results-grid" id="results-grid"></div>
+    </section>
+
+    <!-- ─── Error banner ─── -->
+    <div class="error-banner hidden" id="error-banner"></div>
+</main>
+
+<footer class="footer">
+    <p>Built with CLIP · ViT-B/32 · FAISS · Flask &mdash; CSE4006 Project</p>
+</footer>
+
+<script>
+/* ============================================================
+   FRONTEND JS — handles drag-drop, preview, AJAX search
+   ============================================================ */
+const form          = document.getElementById("search-form");
+const uploadZone    = document.getElementById("upload-zone");
+const imageInput    = document.getElementById("image-input");
+const previewImg    = document.getElementById("preview-img");
+const placeholder   = document.getElementById("upload-placeholder");
+const btnClear      = document.getElementById("btn-clear");
+const promptInput   = document.getElementById("prompt-input");
+const alphaSlider   = document.getElementById("alpha-slider");
+const alphaLabel    = document.getElementById("alpha-label");
+const btnSearch     = document.getElementById("btn-search");
+const btnText       = btnSearch.querySelector(".btn-text");
+const btnLoader     = document.getElementById("btn-loader");
+const resultsSection = document.getElementById("results-section");
+const resultsGrid   = document.getElementById("results-grid");
+const errorBanner   = document.getElementById("error-banner");
+
+/* ── Image upload / drag-drop ── */
+uploadZone.addEventListener("click", () => imageInput.click());
+
+uploadZone.addEventListener("dragover", e => {
+    e.preventDefault();
+    uploadZone.classList.add("drag-over");
+});
+uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("drag-over"));
+uploadZone.addEventListener("drop", e => {
+    e.preventDefault();
+    uploadZone.classList.remove("drag-over");
+    if (e.dataTransfer.files.length) {
+        imageInput.files = e.dataTransfer.files;
+        showPreview(e.dataTransfer.files[0]);
+    }
+});
+
+imageInput.addEventListener("change", () => {
+    if (imageInput.files.length) showPreview(imageInput.files[0]);
+});
+
+function showPreview(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+        previewImg.src = e.target.result;
+        previewImg.classList.remove("hidden");
+        placeholder.classList.add("hidden");
+        btnClear.classList.remove("hidden");
+    };
+    reader.readAsDataURL(file);
+}
+
+btnClear.addEventListener("click", e => {
+    e.stopPropagation();
+    imageInput.value = "";
+    previewImg.src = "";
+    previewImg.classList.add("hidden");
+    placeholder.classList.remove("hidden");
+    btnClear.classList.add("hidden");
+});
+
+/* ── Quick modifier chips ── */
+document.querySelectorAll(".chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+        const val = chip.getAttribute("data-val");
+        let current = promptInput.value.trim();
+        if (!current) {
+            promptInput.value = val;
+        } else if (!current.toLowerCase().includes(val.toLowerCase())) {
+            promptInput.value = current + ", " + val;
+        }
+        promptInput.focus();
+    });
+});
+
+/* ── Alpha slider label ── */
+alphaSlider.addEventListener("input", () => {
+    const v = parseInt(alphaSlider.value);
+    alphaLabel.textContent = `${100 - v} / ${v}`;
+});
+
+/* ── Search form submit ── */
+form.addEventListener("submit", async e => {
+    e.preventDefault();
+    errorBanner.classList.add("hidden");
+
+    const fd = new FormData();
+    if (imageInput.files.length) fd.append("image", imageInput.files[0]);
+    fd.append("prompt", promptInput.value);
+    fd.append("alpha", (parseInt(alphaSlider.value) / 100).toFixed(2));
+    fd.append("category", document.getElementById("category-select").value);
+
+    // UI: loading state
+    btnText.textContent = "Searching…";
+    btnLoader.classList.remove("hidden");
+    btnSearch.disabled = true;
+
+    try {
+        const res = await fetch("/search", { method: "POST", body: fd });
+        const data = await res.json();
+
+        if (!res.ok) {
+            showError(data.error || "Something went wrong.");
+            return;
+        }
+
+        renderResults(data.results, data.parsed_query);
+    } catch (err) {
+        showError("Network error — is the server running?");
+    } finally {
+        btnText.textContent = "Search";
+        btnLoader.classList.add("hidden");
+        btnSearch.disabled = false;
+    }
+});
+
+function showError(msg) {
+    errorBanner.textContent = msg;
+    errorBanner.classList.remove("hidden");
+    resultsSection.classList.add("hidden");
+}
+
+function renderResults(results, parsedQuery) {
+    resultsGrid.innerHTML = "";
+    const feedbackBox = document.getElementById("query-feedback");
+    const badgeList = document.getElementById("feedback-badge-list");
+
+    if (parsedQuery && parsedQuery.detected) {
+        badgeList.innerHTML = "";
+        const d = parsedQuery.detected;
+
+        if (d.patterns && d.patterns.length) {
+            d.patterns.forEach(p => {
+                badgeList.innerHTML += `<span class="feedback-badge badge-pattern">Pattern: ${p}</span>`;
+            });
+        }
+        if (d.sleeves && d.sleeves.length) {
+            d.sleeves.forEach(s => {
+                badgeList.innerHTML += `<span class="feedback-badge badge-sleeve">Sleeve: ${s}</span>`;
+            });
+        }
+        if (d.colors && d.colors.length) {
+            d.colors.forEach(c => {
+                badgeList.innerHTML += `<span class="feedback-badge badge-color">Color: ${c}</span>`;
+            });
+        }
+        if (parsedQuery.canonical) {
+            badgeList.innerHTML += `<span class="feedback-badge badge-canon" title="${parsedQuery.canonical}">🎯 Target: "${parsedQuery.canonical.replace('a photo of a ', '')}"</span>`;
+        }
+        feedbackBox.classList.remove("hidden");
+    } else {
+        feedbackBox.classList.add("hidden");
+    }
+
+    if (!results.length) {
+        showError("No matching products found. Try a different prompt or image.");
+        return;
+    }
+
+    results.forEach((item, i) => {
+        const card = document.createElement("div");
+        card.className = "result-card glass";
+        card.style.animationDelay = `${i * 0.06}s`;
+        card.innerHTML = `
+            <div class="result-img-wrap">
+                <img src="${item.image_url}" alt="${item.asin}" loading="lazy" />
+            </div>
+            <div class="result-info">
+                <span class="result-category">${item.category}</span>
+                <span class="result-score">${(item.score * 100).toFixed(1)}% match</span>
+            </div>
+        `;
+        resultsGrid.appendChild(card);
+    });
+
+    resultsSection.classList.remove("hidden");
+    resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+</script>
+</body>
+</html>
